@@ -9,7 +9,7 @@
 #include <QToolBar>
 #include <QStatusBar>
 
-#include "qopenglwidget.hpp"
+#include "graphicswindowqt.hpp"
 
 namespace hs
 {
@@ -22,7 +22,7 @@ class MainWindow: public QMainWindow
 {
   Q_OBJECT
 public:
-  typedef osgQt::OSGOpenglWidget ViewerWidget;
+  typedef GraphicsOpenglWindowQt ViewerWidget;
 
 public:
   MainWindow(QWidget* parent = 0,Qt::WindowFlags flags = 0);

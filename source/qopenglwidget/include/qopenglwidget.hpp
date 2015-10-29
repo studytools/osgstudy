@@ -3,61 +3,36 @@
 
 #include "OSG_Study/config/hs_config.hpp"
 
-#include <QOpenGLWidget>
+#include <QtGui/QInputEvent>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QWheelEvent>
+#include <QtWidgets/QOpenGLWidget>
 
-#include <osg/Group>
-#include <osg/ref_ptr>
-#include <osgViewer/Viewer>
+#include <osgViewer/GraphicsWindow>
 
-#include <QWidget>
-#include <QOpenGLWidget>
-#include <QMouseEvent>
-
-class QInputEvent;
-
-namespace osgQt
-{
-
-class OSGOpenglWidget : public QOpenGLWidget, public osgViewer::Viewer
+class OpenglWidget : public QOpenGLWidget
 {
   Q_OBJECT
 public:
-  OSGOpenglWidget(QWidget *parent = 0);
-  ~OSGOpenglWidget();
+  OpenglWidget(QWidget *parent = 0);
+  ~OpenglWidget();
 
 protected:
-  virtual void resizeGL(int w,int h) Q_DECL_OVERRIDE;
-  virtual void paintGL() Q_DECL_OVERRIDE;
-  virtual void initializeGL() Q_DECL_OVERRIDE;
-  virtual void timerEvent(QTimerEvent *event);
-
-  void setKeyboardModifiers(QInputEvent* event);
-
+  virtual void keyPressEvent(QKeyEvent* event);
+  virtual void keyReleaseEvent(QKeyEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);
   virtual void mouseReleaseEvent(QMouseEvent* event);
+  virtual void mouseDoubleClickEvent(QMouseEvent* event);
+  virtual void mouseMoveEvent(QMouseEvent* event);
+  virtual void wheelEvent(QWheelEvent* event);
+  virtual void resizeGL(int width,int height);
 
 private:
-  osg::ref_ptr<osg::Camera> CreateCamera(int x, int y, int w, int h);
+  void setKeyboardModifiers(QInputEvent* event);
 
-private:
-  osg::ref_ptr<osg::Group> root_;
-  osg::ref_ptr<osg::Camera> camera_;
-
+protected:
+  osgViewer::GraphicsWindow* graphics_window_;
 };
-
-class GraphicsOpenglWindowQt: public osgViewer::GraphicsWindow
-{
-public:
-  GraphicsOpenglWindowQt(
-    osg::GraphicsContext::Traits* traits,
-    QWidget* parent = NULL,
-    const QGLWidget* shareWidget = NULL,
-    Qt::WindowFlags f = 0);
-  GraphicsOpenglWindowQt( OSGOpenglWidget* widget );
-  ~GraphicsOpenglWindowQt();
-};
-
-
-}
 
 #endif

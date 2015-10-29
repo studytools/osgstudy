@@ -3,19 +3,28 @@
 
 #include "OSG_Study/config/hs_config.hpp"
 
-#include <osgViewer/GraphicsWindow>
+#include "qopenglwidget.hpp"
 
-class QInputEvent;
+#include <osgViewer/Viewer>
 
-namespace osgQt
+class GraphicsOpenglWindowQt: public OpenglWidget, public osgViewer::Viewer
 {
+public:
+  GraphicsOpenglWindowQt(QWidget* parent = 0);
+  ~GraphicsOpenglWindowQt();
 
-  class GraphicsOpenglWindowQt: public osgViewer::GraphicsWindow
-  {
-  public:
-    GraphicsOpenglWindowQt(osg::GraphicsContext::Traits* traits, QWidget* parent = NULL, const QGLWidget* shareWidget = NULL, Qt::WindowFlags f = 0 );
-    ~GraphicsOpenglWindowQt();
-  };
-}
+protected:
+  virtual void initializeGL();
+  virtual void paintGL();
+  virtual void timerEvent(QTimerEvent *event);
+
+private:
+  osg::ref_ptr<osg::Camera> createCamera(int x, int y, int w, int h);
+
+private:
+  osg::ref_ptr<osg::Group> root_;
+
+};
+
 
 #endif
