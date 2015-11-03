@@ -19,7 +19,7 @@ protected:
   virtual void timerEvent(QTimerEvent *event);
 
 private:
-  osg::ref_ptr<osg::Camera> createCamera(int x, int y, int w, int h);
+  void createCamera(int x, int y, int w, int h);
 
 private:
   osg::ref_ptr<osg::Group> root_;
