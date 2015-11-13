@@ -1,78 +1,141 @@
-﻿#include "graphicswindowqt.hpp"
+﻿#include <iostream>
 
-#include <osgDB/ReadFile>
-#include <osgGA/TrackballManipulator>
-#include <osgViewer/api/Win32/GraphicsWindowWin32>
+#include "graphicswindowqt.hpp"
 
-GraphicsOpenglWindowQt::GraphicsOpenglWindowQt(QWidget* parent)
-  : OpenglWidget(parent)
+#include <QOpenGLContext>
+
+GraphicsOpenglWindowQt::GraphicsOpenglWindowQt(
+  ::osg::GraphicsContext::Traits* traits,OpenglWidget* widget)
 {
-  setMouseTracking(true);
+  _traits = traits;
+  widget_ = widget;
+  init();
 }
 GraphicsOpenglWindowQt::~GraphicsOpenglWindowQt()
 {
 }
 
-void GraphicsOpenglWindowQt::initializeGL()
+bool GraphicsOpenglWindowQt::init()
 {
-  root_ = new osg::Group;
-  root_->setName("GraphicsOpenglWindowQtRoot");
+  if (!widget_)
+  {
+    return false;
+  }
+  
+  // initialize State
+  setState(new osg::State);
+  getState()->setGraphicsContext(this);
 
-  createCamera(0,0,width(),height());
-  this->setThreadingModel(osgViewer::Viewer::SingleThreaded);
+  // initialize contextID
+  if(_traits.valid() && _traits->sharedContext.valid())
+  {
+    getState()->setContextID(_traits->sharedContext->getState()->getContextID());
+    incrementContextIDUsageCount(getState()->getContextID());
+  }
+  else
+  {
+    getState()->setContextID(osg::GraphicsContext::createNewContextID());
+  }
 
-  root_->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-  root_->getOrCreateStateSet()->setMode(GL_DEPTH_TEST,osg::StateAttribute::ON);
-  this->setSceneData(root_);
+  // make sure the event queue has the correct window rectangle size and input range
+  getEventQueue()->syncWindowRectangleWithGraphicsContext();
 
-  osg::ref_ptr<osgGA::TrackballManipulator> pManipulator =
-    new osgGA::TrackballManipulator;
-  this->setCameraManipulator(pManipulator);
+  return true;
 
-  osg::ref_ptr<osg::Node> pNode = 
-    osgDB::readNodeFile("../../test_data/cube.osgb");
-  root_->addChild(pNode);
 
-  startTimer(10);
 }
 
-void GraphicsOpenglWindowQt::paintGL()
+bool GraphicsOpenglWindowQt::setWindowRectangleImplementation(int x,int y,int width,int height)
 {
-  frame();
-}
-void GraphicsOpenglWindowQt::timerEvent(QTimerEvent *event)
-{ 
-  update();
+  if(widget_ == NULL)
+      return false;
+
+  widget_->setGeometry(x,y,width,height);
+  return true;
 }
 
-void GraphicsOpenglWindowQt::createCamera(int x,int y,int w,int h)
+
+bool GraphicsOpenglWindowQt::setWindowDecorationImplementation(bool windowDecoration)
 {
-  osg::DisplaySettings* ds = osg::DisplaySettings::instance().get();
-  osg::ref_ptr<osg::GraphicsContext::Traits> traits = 
-    new osg::GraphicsContext::Traits;
-  traits->windowDecoration = true;
-  traits->x = x;
-  traits->y = y;
-  traits->width = w;
-  traits->height = h;
-  traits->doubleBuffer = true;
-  traits->sharedContext = 0;
+  Qt::WindowFlags flags = Qt::Window|Qt::CustomizeWindowHint;//|Qt::WindowStaysOnTopHint;
+  if(windowDecoration)
+      flags |= Qt::WindowTitleHint|Qt::WindowMinMaxButtonsHint|Qt::WindowSystemMenuHint;
+  _traits->windowDecoration = windowDecoration;
 
-  graphics_window_ = new osgViewer::GraphicsWindowEmbedded(traits.get());
+  if(widget_)
+  {
+    widget_->setWindowFlags(flags);
 
-//    osg::ref_ptr<osg::GraphicsContext> gc =
-//      osg::GraphicsContext::createGraphicsContext(traits.get());
-//     
-//   graphics_window_ = dynamic_cast<osgViewer::GraphicsWindow*>(gc.get());
+    return true;
+  }
 
-  getCamera()->setGraphicsContext(graphics_window_);
-  getCamera()->setClearColor(osg::Vec4(0.3,0.3,0.6,0.8));
-  getCamera()->setViewport(new osg::Viewport(0,0,traits->width,traits->height));
-  getCamera()->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  getCamera()->setProjectionMatrixAsPerspective(
-    30.0f,
-    static_cast<double>(traits->width) / static_cast<double>(traits->height),
-    1.0f,10000.0f);
-
+  return false;
 }
+
+void GraphicsOpenglWindowQt::grabFocus()
+{
+  if(widget_)
+      widget_->setFocus(Qt::ActiveWindowFocusReason);
+}
+
+void GraphicsOpenglWindowQt::grabFocusIfPointerInWindow()
+{
+  if(widget_->underMouse())
+      widget_->setFocus(Qt::ActiveWindowFocusReason);
+}
+
+void GraphicsOpenglWindowQt::raiseWindow()
+{
+  if(widget_)
+      widget_->raise();
+}
+
+void GraphicsOpenglWindowQt::setWindowName(const std::string& name)
+{
+  if(widget_)
+      widget_->setWindowTitle(name.c_str());
+}
+
+void GraphicsOpenglWindowQt::setCursor(MouseCursor cursor)
+{
+  if(cursor==InheritCursor && widget_)
+  {
+    widget_->unsetCursor();
+  }
+
+  QCursor current_cursor;
+
+  switch(cursor)
+  {
+  case NoCursor: current_cursor = Qt::BlankCursor; break;
+  case RightArrowCursor: case LeftArrowCursor: current_cursor = Qt::ArrowCursor; break;
+  case InfoCursor: current_cursor = Qt::SizeAllCursor; break;
+  case DestroyCursor: current_cursor = Qt::ForbiddenCursor; break;
+  case HelpCursor: current_cursor = Qt::WhatsThisCursor; break;
+  case CycleCursor: current_cursor = Qt::ForbiddenCursor; break;
+  case SprayCursor: current_cursor = Qt::SizeAllCursor; break;
+  case WaitCursor: current_cursor = Qt::WaitCursor; break;
+  case TextCursor: current_cursor = Qt::IBeamCursor; break;
+  case CrosshairCursor: current_cursor = Qt::CrossCursor; break;
+  case HandCursor: current_cursor = Qt::OpenHandCursor; break;
+  case UpDownCursor: current_cursor = Qt::SizeVerCursor; break;
+  case LeftRightCursor: current_cursor = Qt::SizeHorCursor; break;
+  case TopSideCursor: case BottomSideCursor: current_cursor = Qt::UpArrowCursor; break;
+  case LeftSideCursor: case RightSideCursor: current_cursor = Qt::SizeHorCursor; break;
+  case TopLeftCorner: current_cursor = Qt::SizeBDiagCursor; break;
+  case TopRightCorner: current_cursor = Qt::SizeFDiagCursor; break;
+  case BottomRightCorner: current_cursor = Qt::SizeBDiagCursor; break;
+  case BottomLeftCorner: current_cursor = Qt::SizeFDiagCursor; break;
+  default: break;
+  };
+  if(widget_) widget_->setCursor(current_cursor);
+}
+
+void GraphicsOpenglWindowQt::requestWarpPointer(float x,float y)
+{
+  if(widget_)
+      QCursor::setPos(widget_->mapToGlobal(QPoint((int)x,(int)y)));
+}
+
+
 

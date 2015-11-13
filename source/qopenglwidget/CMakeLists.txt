@@ -5,10 +5,12 @@ set(OSG_EXAMPLE_SOURCES
   "include/mainwindow.hpp"
   "include/qopenglwidget.hpp"
   "include/graphicswindowqt.hpp"
+  "include/viewer_widget.hpp"
   "sources/main.cpp"
   "sources/mainwindow.cpp"
   "sources/qopenglwidget.cpp"
   "sources/graphicswindowqt.cpp"
+  "sources/viewer_widget.cpp"
   )
 set(OSG_EXAMPLE_QT_MODULES
   "Widgets"
@@ -29,8 +31,8 @@ hslib_add_qt_executable(${PROJECT_NAME}
   
 yong_add_dependence(${SOLUTION_NAME} ${PROJECT_NAME}
   DEPENDENT_PROJECT OpenSceneGraph
-    DEPENDENT_LIBS osg OpenThreads osgDB osgUtil osgViewer osgGA osgQt
-                   osgWidget osgText
+    DEPENDENT_LIBS osg OpenThreads osgDB osgUtil osgViewer osgGA                    
+                   osgdb_jpeg osgdb_png osgdb_tiff osgdb_osg osgdb_serializers_osg
   DEPENDENT_PROJECT tiff
     DEPENDENT_LIBS tiff
   DEPENDENT_PROJECT zlib

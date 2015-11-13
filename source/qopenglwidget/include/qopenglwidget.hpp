@@ -3,36 +3,51 @@
 
 #include "OSG_Study/config/hs_config.hpp"
 
-#include <QtGui/QInputEvent>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QWheelEvent>
-#include <QtWidgets/QOpenGLWidget>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
+#include <QMoveEvent>
+#include <QResizeEvent>
+#include <QOpenGLWidget>
 
-#include <osgViewer/GraphicsWindow>
+#include <osg/GraphicsContext>
+
+#include "graphicswindowqt.hpp"
 
 class OpenglWidget : public QOpenGLWidget
 {
-  Q_OBJECT
 public:
   OpenglWidget(QWidget *parent = 0);
-  ~OpenglWidget();
+  virtual ~OpenglWidget();
 
 protected:
-  virtual void keyPressEvent(QKeyEvent* event);
-  virtual void keyReleaseEvent(QKeyEvent* event);
-  virtual void mousePressEvent(QMouseEvent* event);
-  virtual void mouseReleaseEvent(QMouseEvent* event);
-  virtual void mouseDoubleClickEvent(QMouseEvent* event);
-  virtual void mouseMoveEvent(QMouseEvent* event);
-  virtual void wheelEvent(QWheelEvent* event);
-  virtual void resizeGL(int width,int height);
+  void keyPressEvent(QKeyEvent* event);
+  void keyReleaseEvent(QKeyEvent* event);
+  void mousePressEvent(QMouseEvent* event);
+  void mouseReleaseEvent(QMouseEvent* event);
+  void mouseDoubleClickEvent(QMouseEvent* event);
+  void mouseMoveEvent(QMouseEvent* event);
+  void wheelEvent(QWheelEvent* event);
+  void moveEvent(QMoveEvent* event);
+  void resizeEvent(QResizeEvent *event);
+  bool event(QEvent* event);
+
+  virtual void initializeGL(){};
+  virtual void paintGL(){};
+  virtual void resizeGL(int width, int height){};
+
+  friend class GraphicsOpenglWindowQt;
+  GraphicsOpenglWindowQt* graphics_window_;
 
 private:
   void setKeyboardModifiers(QInputEvent* event);
+  void createCamera(int x,int y,int w,int h);
+  static void qsurfaceFormat2traits(
+    const QSurfaceFormat& format,
+    osg::GraphicsContext::Traits* traits);
+  osg::GraphicsContext::Traits* createTraits();
 
-protected:
-  osgViewer::GraphicsWindow* graphics_window_;
 };
 
 #endif
