@@ -49,5 +49,18 @@ if(BUILD_QOPENGLWIDGET_TEST)
 add_subdirectory(./source/qopenglwidget)
 endif()
 
+###############################################################################
+#rename
+option(BUILD_RENAME_TEST "build rename." OFF)
+if(BUILD_RENAME_TEST)
+add_subdirectory(./source/rename)
+endif()
+
+###############################################################################
+#rename
+option(BUILD_OVERLAYNODE_TEST "build overlaynode." OFF)
+if(BUILD_OVERLAYNODE_TEST)
+add_subdirectory(./source/overlaynode)
+endif()
 
 hs_project_end(${SOLUTION_NAME})
