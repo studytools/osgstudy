@@ -43,73 +43,76 @@ osg::Node* createLine(const osg::Vec3& p1, const osg::Vec3& p2)
   return geode;
 }
 
-int main(int argc,char **argv)
-{
-  // use an ArgumentParser object to manage the program arguments.
-  osg::ArgumentParser arguments(&argc,argv);
-
-  // read the scene from the list of file specified commandline args.
-  osg::ref_ptr<osg::Node> scene = osgDB::readNodeFiles(arguments);
-
-  // if not loaded assume no arguments passed in, try use default model instead.
-//   if(!scene) scene = osgDB::readNodeFile("../../test_data/cube.osgb");
-  if(!scene) scene = osgDB::readNodeFile("Tile_+004_+004.osgb");
-  if(!scene)
-  {
-    osg::notify(osg::NOTICE)<<"No model loaded"<<std::endl;
-    return 1;
-  }
-  scene->setName("LODTileMesh");
-  osg::Group* root = new osg::Group;
-
-  osg::ref_ptr<osg::Node> line =
-    createLine(osg::Vec3(-400,-192,180),osg::Vec3(300,-192,180));
-
-  DrawLine* draw_line = new DrawLine;
-  draw_line->set_is_activate(true);
-
-  osgSim::OverlayNode* overlayNode = new osgSim::OverlayNode(
-    osgSim::OverlayNode::OBJECT_DEPENDENT_WITH_ORTHOGRAPHIC_OVERLAY);
-  overlayNode->setContinuousUpdate(true);
-  overlayNode->setOverlaySubgraph(draw_line->root());
-  overlayNode->setOverlayBaseHeight(0.99);
-  overlayNode->addChild(scene);
-  root->addChild(overlayNode);
-
-
-  osgViewer::Viewer viewer;
-//   viewer.setUpViewAcrossAllScreens();
-//   osgViewer::Viewer::Windows windows;
-//   viewer.getWindows(windows);
+// int main(int argc,char **argv)
+// {
+//   // use an ArgumentParser object to manage the program arguments.
+//   osg::ArgumentParser arguments(&argc,argv);
 // 
-//   if(windows.empty()) return 1;
-
-  // set the scene to render
-  viewer.setSceneData(root);
-  viewer.addEventHandler(new DrawLineHandler(draw_line));
-  viewer.setCameraManipulator(new osgGA::TrackballManipulator());
-
-#if 1
-
-  // use of custom simulation time.
-
-  viewer.realize();
-
-  double simulationTime = 0.0;
-
-  while(!viewer.done())
-  {
-//     overlayNode->setOverlaySubgraph(draw_line->root());
-    viewer.frame(simulationTime);
-    simulationTime += 0.001;
-  }
-
-  return 0;
-#else
-
-  // normal viewer usage.
-  return viewer.run();
-
-#endif
-
-}
+//   // read the scene from the list of file specified commandline args.
+//   osg::ref_ptr<osg::Node> scene = osgDB::readNodeFiles(arguments);
+// 
+//   // if not loaded assume no arguments passed in, try use default model instead.
+// //   if(!scene) scene = osgDB::readNodeFile("../../test_data/cube.osgb");
+//   if(!scene) scene = osgDB::readNodeFile("Tile_+004_+004.osgb");
+//   if(!scene)
+//   {
+//     osg::notify(osg::NOTICE)<<"No model loaded"<<std::endl;
+//     return 1;
+//   }
+//   scene->setName("LODTileMesh");
+//   osg::Group* root = new osg::Group;
+//   root->setName("ViewerRoot");
+//   root->setDataVariance(::osg::Object::DYNAMIC);
+// 
+//   osg::Group* mesh_group = new osg::Group;
+//   mesh_group->addChild(scene);
+// 
+//   osg::ref_ptr<osg::Node> line =
+//     createLine(osg::Vec3(-400,-192,180),osg::Vec3(300,-192,180));
+// 
+//   DrawLine* draw_line = new DrawLine;
+//   draw_line->set_is_activate(true);
+// 
+//   osgSim::OverlayNode* overlayNode = new osgSim::OverlayNode(
+//     osgSim::OverlayNode::OBJECT_DEPENDENT_WITH_ORTHOGRAPHIC_OVERLAY);
+//   overlayNode->setContinuousUpdate(true);
+//   overlayNode->setOverlaySubgraph(draw_line->root());
+//   overlayNode->setOverlayBaseHeight(0.99);
+//   overlayNode->addChild(mesh_group);
+//   root->addChild(mesh_group);
+// 
+// 
+//   osgViewer::Viewer viewer;
+//   viewer.setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
+//   viewer.setRunFrameScheme(osgViewer::ViewerBase::CONTINUOUS);
+//   viewer.setSceneData(root);
+//   viewer.addEventHandler(new DrawLineHandler(draw_line));
+// //   viewer.setCameraManipulator(new osgGA::TrackballManipulator());
+//   osgGA::TrackballManipulator* trackball_ = new osgGA::TrackballManipulator();
+//   trackball_->setAllowThrow(false);
+//   viewer.setCameraManipulator(trackball_);
+// 
+// #if 1
+// 
+//   // use of custom simulation time.
+// 
+//   viewer.realize();
+// 
+//   double simulationTime = 0.0;
+// 
+//   while(!viewer.done())
+//   {
+//     trackball_->setNode(root);
+//     viewer.frame();
+//     simulationTime += 0.001;
+//   }
+// 
+//   return 0;
+// #else
+// 
+//   // normal viewer usage.
+//   return viewer.run();
+// 
+// #endif
+// 
+// }
