@@ -6,6 +6,9 @@
 
 #include <osgGA/TrackballManipulator>
 
+#include <osgSim/OverlayNode>
+
+
 #include "osgterrain.hpp"
 #include "draw_line.hpp"
 
@@ -49,15 +52,29 @@ int main(int argc,char** argv)
   root->setName("ViewerRoot");
   root->setDataVariance(::osg::Object::DYNAMIC);
 
-  root->addChild(dem_terrain->terrain_tile());
+//   root->addChild(dem_terrain->terrain_tile());
 
   DrawLine* draw_line = new DrawLine(0x01); 
   draw_line->set_is_activate(true);
   draw_line->set_terrain(dem_terrain);
-
-  root->addChild(draw_line->root());
+  draw_line->set_line_width(10);
+//   root->addChild(draw_line->root());
 
   osg::BoundingSphere bb = root->getBound();
+
+  osgSim::OverlayNode* overlayNode = new osgSim::OverlayNode(
+  osgSim::OverlayNode::OBJECT_DEPENDENT_WITH_ORTHOGRAPHIC_OVERLAY);
+  overlayNode->setContinuousUpdate(true);
+  overlayNode->setOverlaySubgraph(draw_line->root());
+  overlayNode->setOverlayBaseHeight(0.99);
+//   overlayNode->setOverlayTextureSizeHint(2.0);
+  //   osg::ref_ptr<osg::Node> cube = osgDB::readNodeFile("cube.osgb");
+  overlayNode->addChild(dem_terrain->terrain_tile());
+//   osg::ref_ptr<osg::Group> root = new osg::Group;
+  root->addChild(overlayNode);
+//   root->addChild(line);
+
+
 
   viewer.setSceneData(root);
 

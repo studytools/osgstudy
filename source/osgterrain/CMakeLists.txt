@@ -11,7 +11,7 @@ set(SOURCES_FILES
 
 find_package(GDAL REQUIRED)
 
-find_package(OpenSceneGraph 3.5.2 REQUIRED osgDB osgUtil osgViewer osgGA osgTerrain)
+find_package(OpenSceneGraph 3.5.2 REQUIRED osgDB osgUtil osgViewer osgGA osgTerrain osgSim)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${OPENSCENEGRAPH_INCLUDE_DIRS})
 include_directories(${GDAL_INCLUDE_DIR})

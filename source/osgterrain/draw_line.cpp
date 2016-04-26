@@ -22,7 +22,7 @@ DrawLine::DrawLine(NodeMask node_mask)
   geode_->setDataVariance(::osg::Object::DYNAMIC);
   stateset_ = geode_->getOrCreateStateSet();
   stateset_->setAttribute(new ::osg::LineWidth(line_width_));
-  color_->push_back(::osg::Vec4(0.48f,0.4,0.93f,0.5f));
+  color_->push_back(::osg::Vec4(0.48f,0.4,0.93f,1.0f));
   geom_->setColorArray(color_,::osg::Array::BIND_OVERALL);
   geom_->addPrimitiveSet(new ::osg::DrawArrays(GL_LINES,0,2));
   geode_->addDrawable(geom_);
