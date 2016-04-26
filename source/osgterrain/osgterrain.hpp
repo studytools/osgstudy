@@ -1,4 +1,7 @@
-﻿#include <osgGA/GUIEventHandler>
+﻿#ifndef _OSGTERRAIN_HPP_
+#define _OSGTERRAIN_HPP_
+
+#include <osgGA/GUIEventHandler>
 
 #include <osgTerrain/Terrain>
 #include <osgTerrain/TerrainTile>
@@ -33,3 +36,4 @@ private:
   GDALDataset* dataset_;
 };
 
+#endif

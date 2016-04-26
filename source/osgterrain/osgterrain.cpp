@@ -61,18 +61,20 @@ void DEMTerrain::SetLocator(
   }
 
   osg::Matrixd matrix;
-  matrix.set(geo_transform[1], geo_transform[4], 0.0,0.0,
-             geo_transform[2],-geo_transform[5], 0.0,0.0,
+  matrix.set(geo_transform[1], geo_transform[2], 0.0,0.0,
+             geo_transform[4], std::abs(geo_transform[5]), 0.0,0.0,
              0.0,              0.0,              1.0,0.0,
              geo_transform[0], geo_transform[3], 0.0,1.0);
 
   locator->setTransform(
       osg::Matrixd::scale(static_cast<double>(w-1),
-      static_cast<double>(h-1),1.0) * matrix);
+      static_cast<double>(h-1),1.0) * 
+      osg::Matrixd::translate(0,static_cast<double>(h-1)*geo_transform[5]*2,0) * 
+      matrix);
 
-    locator->setDefinedInFile(true);
+  locator->setDefinedInFile(true);
 
-    height_field_layer_->setLocator(locator.get());
+  height_field_layer_->setLocator(locator.get());
 }   
 
 void DEMTerrain::SetHeightField(
@@ -142,12 +144,12 @@ void DEMTerrain::SetHeightField(
       }
     }
 
-    hf->setOrigin(osg::Vec3(BottomLeft[0],BottomLeft[1],0));
 
     hf->setXInterval(sqrt(geo_transform[1]*geo_transform[1] + geo_transform[2]*geo_transform[2]));
     hf->setYInterval(sqrt(geo_transform[4]*geo_transform[4] + geo_transform[5]*geo_transform[5]));
-
     hf->setRotation(osg::Quat(rotation,osg::Vec3d(0.0,0.0,1.0)));
+
+    hf->setOrigin(osg::Vec3(BottomLeft[0],BottomLeft[1],0));
 
     height_field_layer_->setHeightField(hf);
 

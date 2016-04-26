@@ -53,6 +53,7 @@ int main(int argc,char** argv)
 
   DrawLine* draw_line = new DrawLine(0x01); 
   draw_line->set_is_activate(true);
+  draw_line->set_terrain(dem_terrain);
 
   root->addChild(draw_line->root());
 

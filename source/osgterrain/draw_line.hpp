@@ -6,12 +6,14 @@
 #include <osg/Geometry>
 #include <osg/Array>
 #include <osg/NodeCallback>
+#include <osg/Plane>
 
 #include <osgGA/GUIEventHandler>
 #include <osgGA/GUIEventAdapter>
 #include <osgGA/GUIActionAdapter>
 
 #include "event_capture.hpp"
+#include "osgterrain.hpp"
 
 class DrawLine : public EventCapture
 {
@@ -25,9 +27,11 @@ public:
   void set_color(::osg::Vec4 color);
   void set_line_width(float line_width);
   void set_matrix(osg::Matrix m);
+  void set_terrain(DEMTerrain* dem);
 
 private:
   void update(::osg::Vec3 p1,::osg::Vec3 p2);
+  void ComputeDEMPathVertices(const osg::Vec3& startPt,const osg::Vec3& endPt);
 
 private:
   bool is_first_point_finish_;
@@ -37,8 +41,11 @@ private:
   ::osg::StateSet* stateset_;
   ::osg::Geometry* geom_;
   ::osg::Vec3Array* vertices_;
+  ::osg::Vec3Array* dem_path_vertices_;
   ::osg::Vec4Array* color_;
   Intersections intersections_;
+
+  DEMTerrain* dem_;
 };
 
 #endif
